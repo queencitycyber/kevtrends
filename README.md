@@ -21,10 +21,6 @@ python3 kevtrends.py --help
 RTFM
 
 
-```
-
-
-
 ### Thanks
 - Shouts to [simonbyte](https://twitter.com/simonbyte) for initial CVE Trends
 - Shouts to [puzzlepeaches](https://github.com/Sprocket-Security/cvetrends) for inspiration
