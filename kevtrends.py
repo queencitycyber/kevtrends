@@ -11,12 +11,14 @@ URL = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabil
 @click.option("-k", "--keyword", help="Search vendorProject, product, and vulnerabilityName")
 @click.option("-v", "--vendor", help="Filter by vendor")
 @click.option("-d", "--days", type=int, help="Filter by number of days since vulnerability was added")
+@click.option("-n", "--notify", type=click.STRING, help="Notify via Slack Webhook URL")
 @click.pass_context
-def query_endpoint(ctx, cve, keyword, vendor, days):
+def query_endpoint(ctx, cve, keyword, vendor, days, notify):
     """
     Fetches vulnerability info from CISA's KEV (Known Exploited Vulnerabilities) Catalog.
+    Sends a notification to a Slack channel if a webhook URL is provided.
     """
-    if not any([cve, keyword, vendor, days]):
+    if not any([cve, keyword, vendor, days, notify]):
         click.echo(ctx.get_help())
         ctx.exit()
 
@@ -45,7 +47,7 @@ def query_endpoint(ctx, cve, keyword, vendor, days):
             filtered_vulnerabilities
         ))
     
-    # Pritty Print :)
+    # Making table
     console = Console()
     table = Table(show_header=True, header_style="bold")
     table.add_column("CVE ID")
@@ -55,7 +57,7 @@ def query_endpoint(ctx, cve, keyword, vendor, days):
     table.add_column("Date Added")
     table.add_column("Description")
     
-    # Table
+    # Print table
     for vuln in filtered_vulnerabilities:
         table.add_row(
             vuln["cveID"],
@@ -65,9 +67,22 @@ def query_endpoint(ctx, cve, keyword, vendor, days):
             vuln["dateAdded"],
             vuln["shortDescription"]
         )
-    
-    # Print the table
+
+    # Pritty Print :)
     console.print(table)
+
+    # Send notification to Slack if webhook URL is provided
+    if notify:
+        message = "Vulnerabilities filtered and listed successfully."
+        slack_data = {'text': message}
+
+        response = requests.post(
+            notify, json=slack_data,
+            headers={'Content-Type': 'application/json'}
+        )
+
+        if response.status_code != 200:
+            click.echo(f'Notification to Slack failed: {response.status_code}, the response was:\n{response.text}')
 
 if __name__ == "__main__":
     query_endpoint()
