@@ -18,9 +18,7 @@ python3 kevtrends.py --help
 ```
 
 ### Example Usage
-
 RTFM
-
 
 ### Thanks
 - Shouts to [simonbyte](https://twitter.com/simonbyte) for initial CVE Trends
